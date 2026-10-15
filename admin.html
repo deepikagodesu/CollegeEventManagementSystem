@@ -1,0 +1,174 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #283593;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        nav {
+            background: #1a237e;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #3949ab;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .event {
+            background: #e8eaf6;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Admin Dashboard</h1>
+        <p>Manage College Events</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="admin.html">Admin</a>
+        <a href="user.html">Student</a>
+    </nav>
+
+    <div class="container">
+        <h2>Add New Event</h2>
+
+        <form id="eventForm">
+            <input type="text" id="eventName"
+                   placeholder="Event Name" required>
+
+            <input type="date" id="eventDate" required>
+
+            <input type="text" id="eventVenue"
+                   placeholder="Event Venue" required>
+
+            <textarea id="eventDescription"
+                      placeholder="Event Description"
+                      required></textarea>
+
+            <button type="submit">Add Event</button>
+        </form>
+
+        <h2>Created Events</h2>
+        <div id="eventList"></div>
+    </div>
+
+    <script>
+        let events = JSON.parse(
+            localStorage.getItem("collegeEvents") || "[]"
+        );
+
+        function displayEvents() {
+            const list = document.getElementById("eventList");
+            list.innerHTML = "";
+
+            if (events.length === 0) {
+                list.textContent = "No events added yet.";
+                return;
+            }
+
+            events.forEach(function(event, index) {
+                const card = document.createElement("div");
+                card.className = "event";
+
+                const title = document.createElement("h3");
+                title.textContent = event.name;
+
+                const details = document.createElement("p");
+                details.textContent =
+                    "Date: " + event.date +
+                    " | Venue: " + event.venue;
+
+                const description = document.createElement("p");
+                description.textContent = event.description;
+
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "Delete Event";
+                removeButton.onclick = function() {
+                    events.splice(index, 1);
+                    localStorage.setItem(
+                        "collegeEvents", JSON.stringify(events)
+                    );
+                    displayEvents();
+                };
+
+                card.append(title, details, description, removeButton);
+                list.appendChild(card);
+            });
+        }
+
+        document.getElementById("eventForm").onsubmit = function(e) {
+            e.preventDefault();
+
+            const event = {
+                name: document.getElementById("eventName").value.trim(),
+                date: document.getElementById("eventDate").value,
+                venue: document.getElementById("eventVenue").value.trim(),
+                description:
+                    document.getElementById("eventDescription").value.trim()
+            };
+
+            events.push(event);
+            localStorage.setItem(
+                "collegeEvents", JSON.stringify(events)
+            );
+
+            this.reset();
+            displayEvents();
+            alert("Event added successfully!");
+        };
+
+        displayEvents();
+    </script>
+
+</body>
+</html>
+```
