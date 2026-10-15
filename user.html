@@ -1,0 +1,216 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Events</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #283593;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        nav {
+            background: #1a237e;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .event {
+            background: white;
+            padding: 20px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px #ccc;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 6px 0;
+            box-sizing: border-box;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        button {
+            background: #3949ab;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .register-form {
+            margin-top: 12px;
+            padding: 12px;
+            background: #e8eaf6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Student Event Portal</h1>
+        <p>Explore and Register for College Events</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="admin.html">Admin</a>
+        <a href="user.html">Student</a>
+    </nav>
+
+    <div class="container">
+        <h2>Available Events</h2>
+        <div id="eventList"></div>
+
+        <h2>My Registrations</h2>
+        <div id="registrationList"></div>
+    </div>
+
+    <script>
+        const events = JSON.parse(
+            localStorage.getItem("collegeEvents") || "[]"
+        );
+
+        let registrations = JSON.parse(
+            localStorage.getItem("eventRegistrations") || "[]"
+        );
+
+        function displayEvents() {
+            const list = document.getElementById("eventList");
+            list.innerHTML = "";
+
+            if (events.length === 0) {
+                list.textContent = "No events are available currently.";
+                return;
+            }
+
+            events.forEach(function(event, index) {
+                const card = document.createElement("div");
+                card.className = "event";
+
+                const title = document.createElement("h3");
+                title.textContent = event.name;
+
+                const dateVenue = document.createElement("p");
+                dateVenue.textContent =
+                    "Date: " + event.date +
+                    " | Venue: " + event.venue;
+
+                const description = document.createElement("p");
+                description.textContent = event.description;
+
+                const form = document.createElement("form");
+                form.className = "register-form";
+
+                const name = document.createElement("input");
+                name.placeholder = "Enter your name";
+                name.required = true;
+
+                const roll = document.createElement("input");
+                roll.placeholder = "Enter your roll number";
+                roll.required = true;
+
+                const button = document.createElement("button");
+                button.type = "submit";
+                button.textContent = "Register";
+
+                form.append(name, roll, button);
+
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+
+                    const studentName = name.value.trim();
+                    const rollNumber = roll.value.trim();
+
+                    const alreadyRegistered = registrations.some(
+                        function(reg) {
+                            return reg.eventName === event.name &&
+                                reg.rollNumber.toLowerCase() ===
+                                rollNumber.toLowerCase();
+                        }
+                    );
+
+                    if (alreadyRegistered) {
+                        alert("You have already registered for this event.");
+                        return;
+                    }
+
+                    registrations.push({
+                        eventName: event.name,
+                        studentName: studentName,
+                        rollNumber: rollNumber
+                    });
+
+                    localStorage.setItem(
+                        "eventRegistrations",
+                        JSON.stringify(registrations)
+                    );
+
+                    alert("Registration successful!");
+                    displayRegistrations();
+                    form.reset();
+                };
+
+                card.append(title, dateVenue, description, form);
+                list.appendChild(card);
+            });
+        }
+
+        function displayRegistrations() {
+            const list = document.getElementById("registrationList");
+            list.innerHTML = "";
+
+            if (registrations.length === 0) {
+                list.textContent = "You have no registrations yet.";
+                return;
+            }
+
+            registrations.forEach(function(reg) {
+                const item = document.createElement("div");
+                item.className = "event";
+
+                const details = document.createElement("p");
+                details.textContent =
+                    "Student: " + reg.studentName +
+                    " | Roll No: " + reg.rollNumber +
+                    " | Event: " + reg.eventName;
+
+                item.appendChild(details);
+                list.appendChild(item);
+            });
+        }
+
+        displayEvents();
+        displayRegistrations();
+    </script>
+
+</body>
+</html>
+```
